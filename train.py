@@ -6,22 +6,26 @@ import matplotlib.pyplot as plt
 import os
 
 def get_compute_device():
-    # Проверяем доступность Vulkan для видеокарты (например, RX 590)
-    # Примечание: PyTorch имеет экспериментальную поддержку Vulkan, в основном для вывода (inference).
-    # Для полноценного обучения PyTorch обычно использует CUDA (Nvidia) или ROCm (AMD Linux).
-    # Но для такой легкой нейросети обычного процессора (CPU) будет более чем достаточно!
-    if hasattr(torch, 'is_vulkan_available') and torch.is_vulkan_available():
+    # Проверяем поддержку CUDA (для видеокарт Nvidia)
+    if torch.cuda.is_available():
+        print(f"✅ Найдена видеокарта Nvidia: {torch.cuda.get_device_name(0)}")
+        print("🚀 Используем CUDA для максимальной скорости обучения!")
+        return torch.device("cuda")
+        
+    # Проверяем доступность Vulkan (например, для RX 590 или других видеокарт)
+    elif hasattr(torch, 'is_vulkan_available') and torch.is_vulkan_available():
         print("✅ Найден Vulkan! Пытаемся использовать его...")
         try:
-            # Тестируем создание тензора в Vulkan
             _ = torch.tensor([1.0]).to("vulkan")
             return torch.device("vulkan")
         except Exception as e:
             print(f"⚠️ Ошибка инициализации Vulkan для тензоров: {e}")
             print("🔄 Переключаемся на CPU...")
             return torch.device("cpu")
+            
+    # Если ничего нет, используем процессор
     else:
-        print("ℹ️ Vulkan в PyTorch не настроен/не поддерживается для обучения.")
+        print("ℹ️ CUDA (Nvidia) и Vulkan не найдены или не поддерживаются для обучения.")
         print("🚀 Используем процессор (CPU). Для УНО его мощности хватит с запасом!")
         return torch.device("cpu")
 
@@ -76,7 +80,7 @@ def main():
     # Сохраняем график (чтобы не блокировать терминал, сохраняем как картинку)
     plt.figure(figsize=(8, 5))
     plt.plot(episodes_list, win_rates, marker='o', color='b', linewidth=2)
-    plt.title('Прогресс ИИ в УНО (CPU/Vulkan)')
+    plt.title('Прогресс ИИ в УНО (CUDA/Vulkan/CPU)')
     plt.xlabel('Количество партий')
     plt.ylabel('Процент побед (%)')
     plt.grid(True)
