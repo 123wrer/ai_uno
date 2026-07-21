@@ -24,27 +24,32 @@ def translate_card(card_str):
     }
     TRAITS = {
         'skip': 'Пропуск хода 🚫', 
-        'reverse': 'Реверс 🔄', 
+        'reverse': 'Смена направления 🔄', 
         'draw_2': 'Возьми две +2 🃏'
     }
     
-    if card_str == 'wild':
+    if card_str == 'draw':
+        return Text("📥 Взять карту из колоды", style="bold white")
+    elif card_str == 'wild':
         return Text("🌈 Дикая карта (Смена цвета)", style="bold magenta")
     elif card_str == 'wild_draw_4':
         return Text("🌈 Дикая +4", style="bold magenta")
     elif card_str.startswith('wild-'):
         c = card_str.split('-')[1]
         name, color = COLORS.get(c, (c, 'white'))
-        return Text(f"🌈 Дикая (Вы выбрали: {name})", style=f"bold {color}")
+        return Text(f"🌈 Дикая (Выбрать цвет: {name})", style=f"bold {color}")
     elif card_str.startswith('wild_draw_4-'):
         c = card_str.split('-')[1]
         name, color = COLORS.get(c, (c, 'white'))
-        return Text(f"🌈 Дикая +4 (Вы выбрали: {name})", style=f"bold {color}")
+        return Text(f"🌈 Дикая +4 (Выбрать цвет: {name})", style=f"bold {color}")
     elif '-' in card_str:
         c, t = card_str.split('-', 1)
         name, color = COLORS.get(c, (c, 'white'))
         trait = TRAITS.get(t, t)
         return Text(f"{name} {trait}", style=f"bold {color}")
+    elif card_str in COLORS:
+        name, color = COLORS[card_str]
+        return Text(f"Заказан цвет: {name}", style=f"bold {color}")
     else:
         return Text(card_str, style="white")
 
