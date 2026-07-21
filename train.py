@@ -47,8 +47,8 @@ def main():
     random_agent = RandomAgent(num_actions=env.num_actions)
     env.set_agents([agent, random_agent])
 
-    train_episodes = 2000
-    evaluate_every = 200
+    train_episodes = 20000
+    evaluate_every = 1000
     win_rates = []
     episodes_list = []
 
